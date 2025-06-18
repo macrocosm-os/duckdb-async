@@ -6,7 +6,6 @@
   "types": "dist/duckdb-async.d.ts",
   "scripts": {
     "build": "tsc",
-    "postinstall": "npm run build",
     "test": "jest --config jest.config.json --no-cache"
   },
   "repository": {
