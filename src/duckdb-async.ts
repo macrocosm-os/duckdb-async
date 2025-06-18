@@ -3,8 +3,8 @@
  * API but uses Promises instead of callbacks.
  *
  */
-import * as duckdb from "duckdb";
-import { ColumnInfo, TypeInfo } from "duckdb";
+import * as duckdb from "duckdb-lambda-x86";
+import { ColumnInfo, TypeInfo } from "duckdb-lambda-x86";
 import * as util from "util";
 
 type Callback<T> = (err: duckdb.DuckDbError | null, res: T) => void;
@@ -20,7 +20,7 @@ export {
   OPEN_READONLY,
   OPEN_READWRITE,
   OPEN_SHAREDCACHE,
-} from "duckdb";
+} from "duckdb-lambda-x86";
 
 /*
  * Implmentation note:
