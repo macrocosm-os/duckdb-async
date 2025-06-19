@@ -1,13 +1,13 @@
-# duckdb-async-lambda-x64
+# duckdb-async-lambda-x86
 
-TypeScript wrappers using Promises for the duckdb Node.JS API, forked from [duckdb-async](https://github.com/motherduckdb/duckdb-async) 
-to leverage the Vercel compatible fork of duckdb, [duckdb-lambda-x86](https://www.npmjs.com/package/duckdb-lambda-x86).
+TypeScript wrappers using Promises for the Vercel compatible fork of the duckdb Node.JS API.
 
-# Overview and Basic Usage
+## Overview and Basic Usage
 
-This repository provides an API that wraps the [DuckDb NodeJS API](https://duckdb.org/docs/api/nodejs/overview) using Promises
-instead of callbacks.
-The library is implemented in TypeScript to provide static type checking for TypeScript developers. It includes the existing `duckdb`
+This repository provides an API that wraps the Vercel compatible fork of duckdb,
+[duckdb-lambda-x86](https://www.npmjs.com/package/duckdb-lambda-x86) using Promises instead of callbacks.
+
+The library is implemented in TypeScript to provide static type checking for TypeScript developers. It includes the existing `duckdb-lambda-x64`
 NPM module as a dependency, so it should be possible to write applications in TypeScript using only `duckdb-async` as a direct dependency.
 
 Basic usage is straightforward. For example:
