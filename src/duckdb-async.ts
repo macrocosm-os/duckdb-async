@@ -3,24 +3,30 @@
  * API but uses Promises instead of callbacks.
  *
  */
-import * as duckdb from "duckdb-lambda-x86";
-import { ColumnInfo, TypeInfo } from "duckdb-lambda-x86";
-import * as util from "util";
+import os from "os";
+import util from "util";
+import type TDuckDb from "duckdb";
 
-type Callback<T> = (err: duckdb.DuckDbError | null, res: T) => void;
+const isVercel = os.platform() === "linux"; // && os.arch() === "x64";
+const duckdb = require(isVercel ? "duckdb-lambda-x86" : "duckdb") as typeof TDuckDb;
 
-export {
-  DuckDbError,
+export const {
   QueryResult,
-  RowData,
-  TableData,
   OPEN_CREATE,
   OPEN_FULLMUTEX,
   OPEN_PRIVATECACHE,
   OPEN_READONLY,
   OPEN_READWRITE,
   OPEN_SHAREDCACHE,
-} from "duckdb-lambda-x86";
+} = duckdb;
+
+export type {
+  DuckDbError,
+  RowData,
+  TableData
+} from "duckdb";
+
+type Callback<T> = (err: TDuckDb.DuckDbError | null, res: T) => void;
 
 /*
  * Implmentation note:
@@ -41,47 +47,47 @@ function methodPromisify<T extends object, R>(
   ) as any;
 }
 
-const connAllAsync = methodPromisify<duckdb.Connection, duckdb.TableData>(
+const connAllAsync = methodPromisify<TDuckDb.Connection, TDuckDb.TableData>(
   duckdb.Connection.prototype.all
 );
 
-const connArrowIPCAll = methodPromisify<duckdb.Connection, duckdb.ArrowArray>(
+const connArrowIPCAll = methodPromisify<TDuckDb.Connection, TDuckDb.ArrowArray>(
   duckdb.Connection.prototype.arrowIPCAll
 );
 
-const connExecAsync = methodPromisify<duckdb.Connection, void>(
+const connExecAsync = methodPromisify<TDuckDb.Connection, void>(
   duckdb.Connection.prototype.exec
 );
 
-const connPrepareAsync = methodPromisify<duckdb.Connection, duckdb.Statement>(
+const connPrepareAsync = methodPromisify<TDuckDb.Connection, TDuckDb.Statement>(
   duckdb.Connection.prototype.prepare
 );
 
-const connRunAsync = methodPromisify<duckdb.Connection, duckdb.Statement>(
+const connRunAsync = methodPromisify<TDuckDb.Connection, TDuckDb.Statement>(
   duckdb.Connection.prototype.run
 );
 
-const connUnregisterUdfAsync = methodPromisify<duckdb.Connection, void>(
+const connUnregisterUdfAsync = methodPromisify<TDuckDb.Connection, void>(
   duckdb.Connection.prototype.unregister_udf
 );
 
-const connRegisterBufferAsync = methodPromisify<duckdb.Connection, void>(
+const connRegisterBufferAsync = methodPromisify<TDuckDb.Connection, void>(
   duckdb.Connection.prototype.register_buffer
 );
 
-const connUnregisterBufferAsync = methodPromisify<duckdb.Connection, void>(
+const connUnregisterBufferAsync = methodPromisify<TDuckDb.Connection, void>(
   duckdb.Connection.prototype.unregister_buffer
 );
 
-const connCloseAsync = methodPromisify<duckdb.Connection, void>(
+const connCloseAsync = methodPromisify<TDuckDb.Connection, void>(
   duckdb.Connection.prototype.close
 );
 
 export class Connection {
-  private conn: duckdb.Connection | null = null;
+  private conn: TDuckDb.Connection | null = null;
 
   private constructor(
-    ddb: duckdb.Database,
+    ddb: TDuckDb.Database,
     resolve: (c: Connection) => void,
     reject: (reason: any) => void
   ) {
@@ -104,14 +110,14 @@ export class Connection {
     });
   }
 
-  async all(sql: string, ...args: any[]): Promise<duckdb.TableData> {
+  async all(sql: string, ...args: any[]): Promise<TDuckDb.TableData> {
     if (!this.conn) {
       throw new Error("Connection.all: uninitialized connection");
     }
     return connAllAsync(this.conn, sql, ...args);
   }
 
-  async arrowIPCAll(sql: string, ...args: any[]): Promise<duckdb.ArrowArray> {
+  async arrowIPCAll(sql: string, ...args: any[]): Promise<TDuckDb.ArrowArray> {
     if (!this.conn) {
       throw new Error("Connection.arrowIPCAll: uninitialized connection");
     }
@@ -126,7 +132,7 @@ export class Connection {
    * @param args parameters for template query
    * @returns
    */
-  each(sql: string, ...args: [...any, Callback<duckdb.RowData>] | []): void {
+  each(sql: string, ...args: [...any, Callback<TDuckDb.RowData>] | []): void {
     if (!this.conn) {
       throw new Error("Connection.each: uninitialized connection");
     }
@@ -207,7 +213,7 @@ export class Connection {
     this.conn.register_bulk(name, return_type, fun);
   }
 
-  stream(sql: any, ...args: any[]): duckdb.QueryResult {
+  stream(sql: any, ...args: any[]): TDuckDb.QueryResult {
     if (!this.conn) {
       throw new Error("Connection.stream: uninitialized connection");
     }
@@ -217,7 +223,7 @@ export class Connection {
   arrowIPCStream(
     sql: any,
     ...args: any[]
-  ): Promise<duckdb.IpcResultStreamIterator> {
+  ): Promise<TDuckDb.IpcResultStreamIterator> {
     if (!this.conn) {
       throw new Error("Connection.arrowIPCStream: uninitialized connection");
     }
@@ -226,7 +232,7 @@ export class Connection {
 
   register_buffer(
     name: string,
-    array: duckdb.ArrowIterable,
+    array: TDuckDb.ArrowIterable,
     force: boolean
   ): Promise<void> {
     if (!this.conn) {
@@ -252,54 +258,54 @@ export class Connection {
   }
 }
 
-const dbCloseAsync = methodPromisify<duckdb.Database, void>(
+const dbCloseAsync = methodPromisify<TDuckDb.Database, void>(
   duckdb.Database.prototype.close
 );
-const dbAllAsync = methodPromisify<duckdb.Database, duckdb.TableData>(
+const dbAllAsync = methodPromisify<TDuckDb.Database, TDuckDb.TableData>(
   duckdb.Database.prototype.all
 );
-const dbArrowIPCAll = methodPromisify<duckdb.Database, duckdb.ArrowArray>(
+const dbArrowIPCAll = methodPromisify<TDuckDb.Database, TDuckDb.ArrowArray>(
   duckdb.Database.prototype.arrowIPCAll
 );
 
-const dbExecAsync = methodPromisify<duckdb.Database, void>(
+const dbExecAsync = methodPromisify<TDuckDb.Database, void>(
   duckdb.Database.prototype.exec
 );
 
-const dbPrepareAsync = methodPromisify<duckdb.Database, duckdb.Statement>(
+const dbPrepareAsync = methodPromisify<TDuckDb.Database, TDuckDb.Statement>(
   duckdb.Database.prototype.prepare
 );
 
-const dbRunAsync = methodPromisify<duckdb.Database, duckdb.Statement>(
+const dbRunAsync = methodPromisify<TDuckDb.Database, TDuckDb.Statement>(
   duckdb.Database.prototype.run
 );
 
-const dbUnregisterUdfAsync = methodPromisify<duckdb.Database, void>(
+const dbUnregisterUdfAsync = methodPromisify<TDuckDb.Database, void>(
   duckdb.Database.prototype.unregister_udf
 );
 
-const dbSerializeAsync = methodPromisify<duckdb.Database, void>(
+const dbSerializeAsync = methodPromisify<TDuckDb.Database, void>(
   duckdb.Database.prototype.serialize
 );
 
-const dbParallelizeAsync = methodPromisify<duckdb.Database, void>(
+const dbParallelizeAsync = methodPromisify<TDuckDb.Database, void>(
   duckdb.Database.prototype.parallelize
 );
 
-const dbWaitAsync = methodPromisify<duckdb.Database, void>(
+const dbWaitAsync = methodPromisify<TDuckDb.Database, void>(
   duckdb.Database.prototype.wait
 );
 
-const dbRegisterBufferAsync = methodPromisify<duckdb.Database, void>(
+const dbRegisterBufferAsync = methodPromisify<TDuckDb.Database, void>(
   duckdb.Database.prototype.register_buffer
 );
 
-const dbUnregisterBufferAsync = methodPromisify<duckdb.Database, void>(
+const dbUnregisterBufferAsync = methodPromisify<TDuckDb.Database, void>(
   duckdb.Database.prototype.unregister_buffer
 );
 
 export class Database {
-  private db: duckdb.Database | null = null;
+  private db: TDuckDb.Database | null = null;
 
   private constructor(
     path: string,
@@ -353,7 +359,7 @@ export class Database {
   }
 
   // accessor to get internal duckdb Database object -- internal use only
-  get_ddb_internal(): duckdb.Database {
+  get_ddb_internal(): TDuckDb.Database {
     if (!this.db) {
       throw new Error("Database.get_ddb_internal: uninitialized database");
     }
@@ -364,14 +370,14 @@ export class Database {
     return Connection.create(this);
   }
 
-  async all(sql: string, ...args: any[]): Promise<duckdb.TableData> {
+  async all(sql: string, ...args: any[]): Promise<TDuckDb.TableData> {
     if (!this.db) {
       throw new Error("Database.all: uninitialized database");
     }
     return dbAllAsync(this.db, sql, ...args);
   }
 
-  async arrowIPCAll(sql: string, ...args: any[]): Promise<duckdb.ArrowArray> {
+  async arrowIPCAll(sql: string, ...args: any[]): Promise<TDuckDb.ArrowArray> {
     if (!this.db) {
       throw new Error("Database.arrowIPCAll: uninitialized connection");
     }
@@ -386,7 +392,7 @@ export class Database {
    * @param args parameters for template query
    * @returns
    */
-  each(sql: string, ...args: [...any, Callback<duckdb.RowData>] | []): void {
+  each(sql: string, ...args: [...any, Callback<TDuckDb.RowData>] | []): void {
     if (!this.db) {
       throw new Error("Database.each: uninitialized database");
     }
@@ -457,7 +463,7 @@ export class Database {
     return dbUnregisterUdfAsync(this.db, name);
   }
 
-  stream(sql: any, ...args: any[]): duckdb.QueryResult {
+  stream(sql: any, ...args: any[]): TDuckDb.QueryResult {
     if (!this.db) {
       throw new Error("Database.stream: uninitialized database");
     }
@@ -467,7 +473,7 @@ export class Database {
   arrowIPCStream(
     sql: any,
     ...args: any[]
-  ): Promise<duckdb.IpcResultStreamIterator> {
+  ): Promise<TDuckDb.IpcResultStreamIterator> {
     if (!this.db) {
       throw new Error("Database.arrowIPCStream: uninitialized database");
     }
@@ -504,7 +510,7 @@ export class Database {
 
   register_buffer(
     name: string,
-    array: duckdb.ArrowIterable,
+    array: TDuckDb.ArrowIterable,
     force: boolean
   ): Promise<void> {
     if (!this.db) {
@@ -521,7 +527,7 @@ export class Database {
   }
 
   registerReplacementScan(
-    replacementScan: duckdb.ReplacementScanCallback
+    replacementScan: TDuckDb.ReplacementScanCallback
   ): Promise<void> {
     if (!this.db) {
       throw new Error(
@@ -532,30 +538,30 @@ export class Database {
   }
 }
 
-const stmtRunAsync = methodPromisify<duckdb.Statement, void>(
+const stmtRunAsync = methodPromisify<TDuckDb.Statement, void>(
   duckdb.Statement.prototype.run
 );
 
-const stmtFinalizeAsync = methodPromisify<duckdb.Statement, void>(
+const stmtFinalizeAsync = methodPromisify<TDuckDb.Statement, void>(
   duckdb.Statement.prototype.finalize
 );
 
-const stmtAllAsync = methodPromisify<duckdb.Statement, duckdb.TableData>(
+const stmtAllAsync = methodPromisify<TDuckDb.Statement, TDuckDb.TableData>(
   duckdb.Statement.prototype.all
 );
 
 const stmtArrowIPCAllAsync = methodPromisify<
-  duckdb.Statement,
-  duckdb.ArrowArray
+  TDuckDb.Statement,
+  TDuckDb.ArrowArray
 >(duckdb.Statement.prototype.arrowIPCAll);
 
 export class Statement {
-  private stmt: duckdb.Statement;
+  private stmt: TDuckDb.Statement;
 
   /**
    * Construct an async wrapper from a statement
    */
-  private constructor(stmt: duckdb.Statement) {
+  private constructor(stmt: TDuckDb.Statement) {
     this.stmt = stmt;
   }
 
@@ -564,14 +570,14 @@ export class Statement {
    * This is intended for internal use only, and should not be called directly.
    * Use `Database.prepare()` or `Database.run()` to create Statement objects.
    */
-  static create_internal(stmt: duckdb.Statement): Statement {
+  static create_internal(stmt: TDuckDb.Statement): Statement {
     return new Statement(stmt);
   }
 
-  async all(...args: any[]): Promise<duckdb.TableData> {
+  async all(...args: any[]): Promise<TDuckDb.TableData> {
     return stmtAllAsync(this.stmt, ...args);
   }
-  async arrowIPCAll(...args: any[]): Promise<duckdb.ArrowArray> {
+  async arrowIPCAll(...args: any[]): Promise<TDuckDb.ArrowArray> {
     return stmtArrowIPCAllAsync(this.stmt, ...args);
   }
 
@@ -584,7 +590,7 @@ export class Statement {
    *
    * @returns
    */
-  each(...args: [...any, Callback<duckdb.RowData>] | []): void {
+  each(...args: [...any, Callback<TDuckDb.RowData>] | []): void {
     this.stmt.each(...args);
   }
 
@@ -607,7 +613,7 @@ export class Statement {
     return stmtFinalizeAsync(this.stmt);
   }
 
-  columns(): ColumnInfo[] {
+  columns(): TDuckDb.ColumnInfo[] {
     return this.stmt.columns();
   }
 }

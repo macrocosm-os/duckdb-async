@@ -1,12 +1,6 @@
-/**
- * A wrapper around DuckDb node.js API that mirrors that
- * API but uses Promises instead of callbacks.
- *
- */
-import * as duckdb from "duckdb-lambda-x86";
-import { ColumnInfo } from "duckdb-lambda-x86";
-type Callback<T> = (err: duckdb.DuckDbError | null, res: T) => void;
-export { DuckDbError, QueryResult, RowData, TableData, OPEN_CREATE, OPEN_FULLMUTEX, OPEN_PRIVATECACHE, OPEN_READONLY, OPEN_READWRITE, OPEN_SHAREDCACHE, } from "duckdb-lambda-x86";
+import type TDuckDb from "duckdb";
+export type { DuckDbError, QueryResult, RowData, TableData, OPEN_CREATE, OPEN_FULLMUTEX, OPEN_PRIVATECACHE, OPEN_READONLY, OPEN_READWRITE, OPEN_SHAREDCACHE, } from "duckdb";
+type Callback<T> = (err: TDuckDb.DuckDbError | null, res: T) => void;
 export declare class Connection {
     private conn;
     private constructor();
@@ -15,8 +9,8 @@ export declare class Connection {
      * and the DuckDb Node.JS API uses a callback in the Database constructor
      */
     static create(db: Database): Promise<Connection>;
-    all(sql: string, ...args: any[]): Promise<duckdb.TableData>;
-    arrowIPCAll(sql: string, ...args: any[]): Promise<duckdb.ArrowArray>;
+    all(sql: string, ...args: any[]): Promise<TDuckDb.TableData>;
+    arrowIPCAll(sql: string, ...args: any[]): Promise<TDuckDb.ArrowArray>;
     /**
      * Executes the sql query and invokes the callback for each row of result data.
      * Since promises can only resolve once, this method uses the same callback
@@ -25,7 +19,7 @@ export declare class Connection {
      * @param args parameters for template query
      * @returns
      */
-    each(sql: string, ...args: [...any, Callback<duckdb.RowData>] | []): void;
+    each(sql: string, ...args: [...any, Callback<TDuckDb.RowData>] | []): void;
     /**
      * Execute one or more SQL statements, without returning results.
      * @param sql queries or statements to executes (semicolon separated)
@@ -40,9 +34,9 @@ export declare class Connection {
     register_udf(name: string, return_type: string, fun: (...args: any[]) => any): void;
     unregister_udf(name: string): Promise<void>;
     register_bulk(name: string, return_type: string, fun: (...args: any[]) => any): void;
-    stream(sql: any, ...args: any[]): duckdb.QueryResult;
-    arrowIPCStream(sql: any, ...args: any[]): Promise<duckdb.IpcResultStreamIterator>;
-    register_buffer(name: string, array: duckdb.ArrowIterable, force: boolean): Promise<void>;
+    stream(sql: any, ...args: any[]): TDuckDb.QueryResult;
+    arrowIPCStream(sql: any, ...args: any[]): Promise<TDuckDb.IpcResultStreamIterator>;
+    register_buffer(name: string, array: TDuckDb.ArrowIterable, force: boolean): Promise<void>;
     unregister_buffer(name: string): Promise<void>;
     close(): Promise<void>;
 }
@@ -61,10 +55,10 @@ export declare class Database {
      */
     static create(path: string, accessMode?: number | Record<string, string>): Promise<Database>;
     close(): Promise<void>;
-    get_ddb_internal(): duckdb.Database;
+    get_ddb_internal(): TDuckDb.Database;
     connect(): Promise<Connection>;
-    all(sql: string, ...args: any[]): Promise<duckdb.TableData>;
-    arrowIPCAll(sql: string, ...args: any[]): Promise<duckdb.ArrowArray>;
+    all(sql: string, ...args: any[]): Promise<TDuckDb.TableData>;
+    arrowIPCAll(sql: string, ...args: any[]): Promise<TDuckDb.ArrowArray>;
     /**
      * Executes the sql query and invokes the callback for each row of result data.
      * Since promises can only resolve once, this method uses the same callback
@@ -73,7 +67,7 @@ export declare class Database {
      * @param args parameters for template query
      * @returns
      */
-    each(sql: string, ...args: [...any, Callback<duckdb.RowData>] | []): void;
+    each(sql: string, ...args: [...any, Callback<TDuckDb.RowData>] | []): void;
     /**
      * Execute one or more SQL statements, without returning results.
      * @param sql queries or statements to executes (semicolon separated)
@@ -87,15 +81,15 @@ export declare class Database {
     run(sql: string, ...args: any[]): Promise<Statement>;
     register_udf(name: string, return_type: string, fun: (...args: any[]) => any): void;
     unregister_udf(name: string): Promise<void>;
-    stream(sql: any, ...args: any[]): duckdb.QueryResult;
-    arrowIPCStream(sql: any, ...args: any[]): Promise<duckdb.IpcResultStreamIterator>;
+    stream(sql: any, ...args: any[]): TDuckDb.QueryResult;
+    arrowIPCStream(sql: any, ...args: any[]): Promise<TDuckDb.IpcResultStreamIterator>;
     serialize(): Promise<void>;
     parallelize(): Promise<void>;
     wait(): Promise<void>;
     interrupt(): void;
-    register_buffer(name: string, array: duckdb.ArrowIterable, force: boolean): Promise<void>;
+    register_buffer(name: string, array: TDuckDb.ArrowIterable, force: boolean): Promise<void>;
     unregister_buffer(name: string): Promise<void>;
-    registerReplacementScan(replacementScan: duckdb.ReplacementScanCallback): Promise<void>;
+    registerReplacementScan(replacementScan: TDuckDb.ReplacementScanCallback): Promise<void>;
 }
 export declare class Statement {
     private stmt;
@@ -108,9 +102,9 @@ export declare class Statement {
      * This is intended for internal use only, and should not be called directly.
      * Use `Database.prepare()` or `Database.run()` to create Statement objects.
      */
-    static create_internal(stmt: duckdb.Statement): Statement;
-    all(...args: any[]): Promise<duckdb.TableData>;
-    arrowIPCAll(...args: any[]): Promise<duckdb.ArrowArray>;
+    static create_internal(stmt: TDuckDb.Statement): Statement;
+    all(...args: any[]): Promise<TDuckDb.TableData>;
+    arrowIPCAll(...args: any[]): Promise<TDuckDb.ArrowArray>;
     /**
      * Executes the sql query and invokes the callback for each row of result data.
      * Since promises can only resolve once, this method uses the same callback
@@ -120,7 +114,7 @@ export declare class Statement {
      *
      * @returns
      */
-    each(...args: [...any, Callback<duckdb.RowData>] | []): void;
+    each(...args: [...any, Callback<TDuckDb.RowData>] | []): void;
     /**
      * Call `duckdb.Statement.run` directly without awaiting completion.
      * @param args arguments passed to duckdb.Statement.run()
@@ -129,5 +123,5 @@ export declare class Statement {
     runSync(...args: any[]): Statement;
     run(...args: any[]): Promise<Statement>;
     finalize(): Promise<void>;
-    columns(): ColumnInfo[];
+    columns(): TDuckDb.ColumnInfo[];
 }

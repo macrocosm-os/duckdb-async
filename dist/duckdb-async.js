@@ -1,47 +1,18 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Statement = exports.Database = exports.Connection = exports.OPEN_SHAREDCACHE = exports.OPEN_READWRITE = exports.OPEN_READONLY = exports.OPEN_PRIVATECACHE = exports.OPEN_FULLMUTEX = exports.OPEN_CREATE = exports.TableData = exports.RowData = exports.QueryResult = exports.DuckDbError = void 0;
+exports.Statement = exports.Database = exports.Connection = void 0;
 /**
  * A wrapper around DuckDb node.js API that mirrors that
  * API but uses Promises instead of callbacks.
  *
  */
-const duckdb = __importStar(require("duckdb-lambda-x86"));
-const util = __importStar(require("util"));
-var duckdb_lambda_x86_1 = require("duckdb-lambda-x86");
-Object.defineProperty(exports, "DuckDbError", { enumerable: true, get: function () { return duckdb_lambda_x86_1.DuckDbError; } });
-Object.defineProperty(exports, "QueryResult", { enumerable: true, get: function () { return duckdb_lambda_x86_1.QueryResult; } });
-Object.defineProperty(exports, "RowData", { enumerable: true, get: function () { return duckdb_lambda_x86_1.RowData; } });
-Object.defineProperty(exports, "TableData", { enumerable: true, get: function () { return duckdb_lambda_x86_1.TableData; } });
-Object.defineProperty(exports, "OPEN_CREATE", { enumerable: true, get: function () { return duckdb_lambda_x86_1.OPEN_CREATE; } });
-Object.defineProperty(exports, "OPEN_FULLMUTEX", { enumerable: true, get: function () { return duckdb_lambda_x86_1.OPEN_FULLMUTEX; } });
-Object.defineProperty(exports, "OPEN_PRIVATECACHE", { enumerable: true, get: function () { return duckdb_lambda_x86_1.OPEN_PRIVATECACHE; } });
-Object.defineProperty(exports, "OPEN_READONLY", { enumerable: true, get: function () { return duckdb_lambda_x86_1.OPEN_READONLY; } });
-Object.defineProperty(exports, "OPEN_READWRITE", { enumerable: true, get: function () { return duckdb_lambda_x86_1.OPEN_READWRITE; } });
-Object.defineProperty(exports, "OPEN_SHAREDCACHE", { enumerable: true, get: function () { return duckdb_lambda_x86_1.OPEN_SHAREDCACHE; } });
+const os_1 = __importDefault(require("os"));
+const util_1 = __importDefault(require("util"));
+const isVercel = os_1.default.platform() === "linux"; // && os.arch() === "x64";
+const duckdb = require(isVercel ? "duckdb-lambda-x64" : "duckdb");
 /*
  * Implmentation note:
  *   Although the method types exposed to users of this library
@@ -54,7 +25,7 @@ Object.defineProperty(exports, "OPEN_SHAREDCACHE", { enumerable: true, get: func
  *   for detailed discussion.
  */
 function methodPromisify(methodFn) {
-    return util.promisify((target, ...args) => methodFn.bind(target)(...args));
+    return util_1.default.promisify((target, ...args) => methodFn.bind(target)(...args));
 }
 const connAllAsync = methodPromisify(duckdb.Connection.prototype.all);
 const connArrowIPCAll = methodPromisify(duckdb.Connection.prototype.arrowIPCAll);
