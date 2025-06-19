@@ -7,8 +7,8 @@ import os from "os";
 import util from "util";
 import type TDuckDb from "duckdb";
 
-const isVercel = os.platform() === "linux"; // && os.arch() === "x64";
-const duckdb = require(isVercel ? "duckdb-lambda-x86" : "duckdb") as typeof TDuckDb;
+const isAmazonLinux2 = os.release().includes("amzn2") && os.platform() === "linux" && os.arch() === "x64";
+const duckdb = require(isAmazonLinux2 ? "duckdb-lambda-x86" : "duckdb") as typeof TDuckDb;
 
 export const {
   QueryResult,

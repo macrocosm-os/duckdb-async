@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Statement = exports.Database = exports.Connection = void 0;
+exports.Statement = exports.Database = exports.Connection = exports.OPEN_SHAREDCACHE = exports.OPEN_READWRITE = exports.OPEN_READONLY = exports.OPEN_PRIVATECACHE = exports.OPEN_FULLMUTEX = exports.OPEN_CREATE = exports.QueryResult = void 0;
 /**
  * A wrapper around DuckDb node.js API that mirrors that
  * API but uses Promises instead of callbacks.
@@ -11,8 +11,9 @@ exports.Statement = exports.Database = exports.Connection = void 0;
  */
 const os_1 = __importDefault(require("os"));
 const util_1 = __importDefault(require("util"));
-const isVercel = os_1.default.platform() === "linux"; // && os.arch() === "x64";
-const duckdb = require(isVercel ? "duckdb-lambda-x64" : "duckdb");
+const isAmazonLinux2 = os_1.default.release().includes("amzn2") && os_1.default.platform() === "linux" && os_1.default.arch() === "x64";
+const duckdb = require(isAmazonLinux2 ? "duckdb-lambda-x86" : "duckdb");
+exports.QueryResult = duckdb.QueryResult, exports.OPEN_CREATE = duckdb.OPEN_CREATE, exports.OPEN_FULLMUTEX = duckdb.OPEN_FULLMUTEX, exports.OPEN_PRIVATECACHE = duckdb.OPEN_PRIVATECACHE, exports.OPEN_READONLY = duckdb.OPEN_READONLY, exports.OPEN_READWRITE = duckdb.OPEN_READWRITE, exports.OPEN_SHAREDCACHE = duckdb.OPEN_SHAREDCACHE;
 /*
  * Implmentation note:
  *   Although the method types exposed to users of this library

@@ -1,5 +1,6 @@
 import type TDuckDb from "duckdb";
-export type { DuckDbError, QueryResult, RowData, TableData, OPEN_CREATE, OPEN_FULLMUTEX, OPEN_PRIVATECACHE, OPEN_READONLY, OPEN_READWRITE, OPEN_SHAREDCACHE, } from "duckdb";
+export declare const QueryResult: typeof TDuckDb.QueryResult, OPEN_CREATE: number, OPEN_FULLMUTEX: number, OPEN_PRIVATECACHE: number, OPEN_READONLY: number, OPEN_READWRITE: number, OPEN_SHAREDCACHE: number;
+export type { DuckDbError, RowData, TableData } from "duckdb";
 type Callback<T> = (err: TDuckDb.DuckDbError | null, res: T) => void;
 export declare class Connection {
     private conn;
