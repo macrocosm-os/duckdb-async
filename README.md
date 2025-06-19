@@ -1,6 +1,7 @@
-# duckdb-async
+# duckdb-async-lambda-x64
 
-TypeScript wrappers using Promises for the duckdb Node.JS API
+TypeScript wrappers using Promises for the duckdb Node.JS API, forked from [duckdb-async](https://github.com/motherduckdb/duckdb-async) 
+to leverage the Vercel compatible fork of duckdb, [duckdb-lambda-x86](https://www.npmjs.com/package/duckdb-lambda-x86).
 
 # Overview and Basic Usage
 
