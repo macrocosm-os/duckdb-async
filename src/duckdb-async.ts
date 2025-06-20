@@ -7,7 +7,8 @@ import os from "os";
 import util from "util";
 import type TDuckDb from "duckdb";
 
-const isAmazonLinux2 = os.release().includes("amzn2") && os.platform() === "linux" && os.arch() === "x64";
+// const isAmazonLinux2 = os.release().includes("amzn2") && os.platform() === "linux" && os.arch() === "x64";
+const isAmazonLinux2 = os.platform() === "linux";
 const duckdb = require(isAmazonLinux2 ? "duckdb-lambda-x86" : "duckdb") as typeof TDuckDb;
 
 export const {

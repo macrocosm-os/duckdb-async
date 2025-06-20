@@ -11,7 +11,8 @@ exports.Statement = exports.Database = exports.Connection = exports.OPEN_SHAREDC
  */
 const os_1 = __importDefault(require("os"));
 const util_1 = __importDefault(require("util"));
-const isAmazonLinux2 = os_1.default.release().includes("amzn2") && os_1.default.platform() === "linux" && os_1.default.arch() === "x64";
+// const isAmazonLinux2 = os.release().includes("amzn2") && os.platform() === "linux" && os.arch() === "x64";
+const isAmazonLinux2 = os_1.default.platform() === "linux";
 const duckdb = require(isAmazonLinux2 ? "duckdb-lambda-x86" : "duckdb");
 exports.QueryResult = duckdb.QueryResult, exports.OPEN_CREATE = duckdb.OPEN_CREATE, exports.OPEN_FULLMUTEX = duckdb.OPEN_FULLMUTEX, exports.OPEN_PRIVATECACHE = duckdb.OPEN_PRIVATECACHE, exports.OPEN_READONLY = duckdb.OPEN_READONLY, exports.OPEN_READWRITE = duckdb.OPEN_READWRITE, exports.OPEN_SHAREDCACHE = duckdb.OPEN_SHAREDCACHE;
 /*
